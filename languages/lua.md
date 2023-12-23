@@ -74,12 +74,12 @@ print("")
 -- 创建模板类结构
 Class = {}
 
-Class:print (args)
+Class.print = function(self, args)
     print("hello, world")
 end
 
 -- 创建类对象
-Class:new (args)
+Class.new = function (self, args)
     obj = {}
     -- 为新对象设置模板/蓝图
     setmetatable(obj, self)
@@ -91,6 +91,10 @@ obj = Class:new()
 obj:func()
 
 ```
+
+** 约定 **
+- 在定义类型时, 统一使用点号定义, 并且显式注明 `self`.
+- 在调用函数时, 统一使用冒号调用.
 
 
 
