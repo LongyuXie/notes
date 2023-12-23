@@ -18,4 +18,32 @@ lua 中冒号和点号都可以用来定义函数和调用函数, 简单来说�
 3. 在函数调用时冒号相比于点号会自动传入 `self` 作为第一个参数, 而点号需要手动传入.
 4. 当对象需要访问自身的成员变量时, 使用冒号定义, 否则使用点号定义.
 
+## 面向对象设计
+
+在 lua 中, 需要使用原型模式来设计类, 一个通俗的解释就是在设计一个类时, 首先描述一个类的模板, 然后根据模板来创建对象.
+受数据结构限制, lua 使用 `table` 来定义类模板类似于 javascript 中的 `object`.
+
+```lua
+-- 创建模板类结构
+Class = {}
+
+Class:print (args)
+    print("hello, world")
+end
+
+-- 创建类对象
+Class:new (args)
+    obj = {}
+    -- 为新对象设置模板/蓝图
+    setmetatable(obj, self)
+    return obj
+end
+
+-- 对象创建与使用
+obj = Class:new()
+obj:func()
+
+```
+
+
 
