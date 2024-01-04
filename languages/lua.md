@@ -96,5 +96,27 @@ obj:func()
 - 在定义类型时, 统一使用点号定义, 并且显式注明 `self`.
 - 在调用函数时, 统一使用冒号调用.
 
+## 基本知识与API
 
+- lua 数组下标从 1 开始.
+- 数组长度: `#arr`.
+- 删除元素: `table.remove(tbl, key)`.
+- 末尾增加元素: `arr[#arr+1] = value`.
+- 插入元素: `table.insert(tbl, value)`
+- for 循环(闭区间): `for i = 1, #arr do body end`.
+- for 循环: `for idx, value in ipairs(arr) do body end`.
+
+
+## 数据类型
+
+- nil.
+- boolean. false 和 nil 为 false, 其他值为 true.
+- number. double 类型变量.
+- string. 单引号, 双引号和 `[[]]`
+- function.
+- userdata.
+- thread.
+- table. 可以是字典, 也可用作数组, 索引默认从1开始. 通过pairs和ipairs进行遍历, 前者遍历所有的 key, 后者只遍历值大于等于 1 的 key.
+
+判断数据类型使用 `type(val)`, 返回对应类型的字符串.
 
