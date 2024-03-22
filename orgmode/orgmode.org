@@ -1,0 +1,66 @@
+#+TITLE: Org Mode
+#+AUTHOR: 谢龙玉
+#+DATE: 2024-03-22
+
+* 基本语法
+
+** 大纲(Outline)
+
+    在Org Mode中, 文档内容是通过headline来组织成一个树状结构, 对比Markdown语法,
+    headline就类似于几级标题, 只不过在Org Mode中使用"*"来定义级别, 而Markdown使用"#".
+
+    headline在Org Mode中会被高亮显示, 不同级别的headline使用不同的颜色标识.
+    要创建headline只需要一行文字以若干个"*"开头, 并且前面不能有空白符.
+
+*** TODO subtree
+    SCHEDULED: <2024-03-22 Fri>
+    # 增加操作大纲的快捷键描述
+
+    Org Mode提供了能够快速操作headline树状结构的方法, 例如只显示headline, 或者只显示
+    第一级的headline, 这也就是所谓的大纲outline. 利用这些大纲操作, 可以很好地概览文档
+    快速定位和编辑.
+
+    * subtree cycling
+        - Folded: 对当前的headline, 只显示headline, 其下的子节点和内容被隐藏
+        - Children: 对当前的headline, 只显示headline, 以及更低一级的headline
+        - Subtree: 对当前的headline, 只显示当前headline以及其下更低的headline
+    * global cycling
+        - 状态变化与subtree类似, 不过针对的是整个文档, 也就是在title级别.
+
+
+** 列表
+
++ 无序列表
+    * 使用"+", "-", "*", 后接空格分隔开的列表项目和内容
+    * 如果以"*"开头的列表, 如果在定格则识别为headline
+    * 如果需要结束一个列表, 那么在最后一行跟随两个空行
++ 有序列表
+    1. 使用"1.", "1)"开头
+    2. 其他同无序列表
+
+** 文本操作
+
++ *粗体*: 使用"*"包裹
++ /斜体/: 使用"/"包裹
++ _下划线_: 使用"_"包裹
++ +删除线+: 使用"+"包裹
++ 引用块
+#+BEGIN_QUOTE
+引用的内容
+#+END_QUOTE
++ 示例块
+#+BEGIN_EXAMPLE
+示例
+#+END_EXAMPLE
++ 代码块
+#+BEGIN_SRC C++
+#include <iostream>
+using namespace std;
+
+int main() {
+
+   return 0;
+}
+#+END_SRC
+# + 图片: file:/assets/img/test.png
+# + 链接: [[<link url>][测试链接]]
