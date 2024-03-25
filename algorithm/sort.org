@@ -1,0 +1,157 @@
+#+TITLE:     排序算法
+#+AUTHOR:    谢龙玉
+#+EMAIL:     1308963950@qq.com
+#+DATE:		 [2024-03-25 Mon]
+
+* 快速排序
+
+** 基本概念
+
+   快速排序算法是一种分治排序算法, 它的基本原理如下:
+   1. 选择数组中的一个元素:r
+   2. 对数组进行划分, 比r小的元素在r的左边: left_part, 大于等于r的元素在r的右边: right_part
+   3. 对left_part和right_part分别执行步骤1和步骤2
+   4. 退出条件: 如果数组中只剩下一个元素则退出
+
+** 算法实现
+
+   #+begin_src java
+   class Solution {
+       public int void quickSort(int[] nums) {
+           if (nums.length <= 1) return;
+           quickSort(nums, 0, nums.length-1);
+       } 
+       // 左闭右闭: [start, end]
+       private void quickSort(int[] nums, int start, int end) {
+           if (start >= end) return;
+           // 对区间内的元素进行划分, 并且获取到划分位置
+           int pivot = partition(nums, start, end);
+           quickSort(nums, start, pivot-1);
+           quickSort(nums, pivot+1, end);
+       }
+       private int partition(int[] nums, int start, int end) {
+           int selected = nums[start];
+           int i = start;
+           int j = end;
+           while (i < j) {
+               while (i < j && nums[j] >= selected) {
+                   j--;
+               }
+               nums[i] = nums[j];
+               while (i < j && nums[i] < selected) {
+                   i++;
+               }
+               nums[j] = nums[i];
+           }
+           nums[i] = selected;
+           return i;
+       }
+       private void swap(int[] nums, int i, int j) {
+           int tmp = nums[i];
+           nums[i] = nums[j];
+           nums[j] = tmp;
+       } 
+   }
+   #+end_src
+   *Note:* 
+   1. 快速排序时需要明确左闭右开区间\([start, end)\)还是左闭右闭区间\([start, end]\)
+   2. 对于如何进行区间划分没有特定的算法, 因此可以使用不同的区间划分算法
+   3. 划分标志数r可以选择不同的元素, 例如可以从左, 中, 右三个数里选择中位数进行划分以减少时间复杂度
+   4. 对于标志数r在一次划分中, 实际上就决定了r在排序后的位置.
+
+* 快速选择(数组中的第K大元素)
+
+  根据快速排序的原理, 我们知道对一个标志数r进行划分, 就意味着决定了排序后的数组这个元素r的顺序.
+  假设元素r在划分中被划分到位置k, 那么这就以为, r左边的k个元素都小于r, 其右边的元素都大于等于r.
+  也就是说r是数组中的第k+1大的元素, 我们假设第k大从1开始.
+
+  所以只需要稍微改进快速排序算法, 就可以解决找到数组中的第K大元素.
+
+  #+begin_src java
+  class Solution {
+      public int findKthLargest(int[] nums, int k) {
+        int n = nums.length;
+        if (n == 1) return nums[0];
+        return quickSelect(nums, 0, n-1, n-k);
+      }
+        // 左闭右闭: [start, end]
+      private int quickSelect(int[] nums, int start, int end, int k) {
+          if (start >= end) return nums[start];
+          // 对区间内的元素进行划分, 并且获取到划分位置
+          int pivot = partition(nums, start, end);
+          if (pivot == k) {
+              return nums[pivot];
+          } else if (pivot < k) {
+              return quickSelect(nums, pivot+1, end, k);
+          }
+          return quickSelect(nums, start, pivot-1, k);
+      }
+  }
+  #+end_src
+  *Note*
+  1. 数组中第K大的元素在排序后位置是: n-K
+
+* 堆排序
+　堆排序是利用堆这种数据结构而设计的一种排序算法,
+  堆排序是一种选择排序, 它的最坏, 最好, 平均时间复杂度均为\(O(n\log n)\), 它也是不稳定排序.
+
+  堆是一颗完全二叉树, 并且满足性质:
+  1. 根节点的值小于(大于)其左右孩子节点的值
+  2. 左右子树也是一个小顶堆(大顶堆)
+
+  要理解堆排序, 需要清楚两点内容:
+  1. 如何将一个数组转化成堆(以下利用大顶堆进行排序)结构: \(arr \rightarrow heap\)
+     堆是一种特殊的完全二叉树, 在内存中可以通过数组存储, 长度为 ~n=arr.length~, 树的根节点对应于下标 ~0~,
+     对于任何一个节点下标 ~x~, 那么起左孩子下标为 ~2x+1~ ,右孩子下标为 ~2x+2~, 其父节点的下标为 ~(x-1)/2~.
+
+     很显然, 堆是一个递归的定义, 那么在初始化堆时, 我们可以从最后一个子树开始调整, 将其转换成堆,
+     然后继续调整倒数第二个子树, 一直到堆顶, 也就是将根节点也调整为堆.
+     
+     这里涉及到一个问题, 就是再假定左右孩子节点是一个有效的堆结构时, 如何将parent对应的子树也调整为堆?
+     已知左右子树是一个有效堆, 那么左右孩子就一定是左右子树的最大值
+     - 如果 ~parent >= max(child1, child2)~, 那么这是一个有效堆
+     - 假设child是较大的一个节点, 那么调整之后的堆顶就是 ~arr[child]~, 所以可以将parent与child交换, 然后问题就转化成了
+       调整原本child对应的子树使其成为一个有效堆
+
+  2. 如何利用现有的堆结构进行排序 
+     假设我们已经将数组转换成了一个大顶堆, 这意味着堆顶元素是最大值, 所以我们得到了堆顶元素的序(位置), 
+     所以我们可以将堆顶元素与末尾元素交换, 然后调整一个范围更小的堆结构.
+     这样每次调整堆选择出一个"最大元素", 一共需要进行 \(n-1\) 次, 每次执行的代价至多为 \(\log (n)\)
+
+  #+begin_src java
+  class Solution {
+      public static void adjust_head(int[] nums, int start, int end) {
+          int parent = start;
+          int child = parent * 2 + 1;
+
+          while (child <= end) {
+              if (child+1 <= end && nums[child] < nums[child+1]) child += 1;
+              if (nums[parent] >= nums[child]) {
+                  return;
+              } else {
+                  swap(nums, child, parent);
+                  parent = child;
+                  child = parent * 2 + 1;
+              }
+          }
+      }
+      public static void headSort(int[] nums) {
+          int n = nums.length;
+          if (n <= 1) return;
+          // 初始建堆
+          for (int i = (n-2)/2; i >= 0; i--) {
+              adjust_head(nums, i, n-1);
+          }
+          for (int i = n-1; i > 0; i--) {
+               swap(nums, 0, i);
+               adjust_head(nums, 0, i-1);
+          }
+      }
+  }
+  #+end_src
+
+
+
+
+
+
