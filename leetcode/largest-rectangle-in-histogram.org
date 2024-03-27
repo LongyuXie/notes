@@ -1,0 +1,74 @@
+#+TITLE:     柱状图中的最大矩形
+#+AUTHOR:    谢龙玉
+#+EMAIL:     1308963950@qq.com
+#+DATE:		 [2024-03-26 Tue]
+
+
+* 题目描述
+  给定一个非负整数数组 nums, 这个数组的每个元素代表一个高度为 nums[i], 宽度为 1 的相邻柱子.
+  求这个柱状图中的最大矩形面积.
+
+  示例1:
+  [[https://assets.leetcode.com/uploads/2021/01/04/histogram.jpg]]
+
+* 解题思路
+
+
+** 暴力方法
+
+   矩形的面积公式是 \(w \times h\), 因此
+   一个直接的思路就是使用两重循环, 来枚举所有可能的矩形.
+   这样的枚举方式有两种:
+   1. 一种是固定矩形的左边界, 同时枚举最小高度和右边界
+   #+begin_src java
+   public int largestRectangleArea1(int[] nums) {
+       var ans = Integer.MIN_VALUE;
+       var n = nums.length;
+
+       for (int i = 0; i < n; i++) {
+           var minHeight = Integer.MAX_VALUE;
+           for (int j = 1; j < n; j++) {
+               minHeight = Math.min(minHeight, nums[j]);
+               ans = Math.max((j-i+1) * minHeight, ans);
+           }
+       }
+       return ans;
+   }
+   #+end_src
+   2. 另一种是固定矩形的高度, 向左和向右枚举矩形的左右边界
+   #+begin_src java
+   public int largestRectangleArea2(int[] nums) {
+       var ans = Integer.MIN_VALUE;
+       var n = nums.length;
+       for (int i = 0; i < n; i++) {
+           int left = i;
+           int right = i;
+           while (left >= 0 && nums[left] >= nums[i]) {
+               left -= 1;
+           }
+           while (right < n && nums[right] >= nums[i]) {
+               right += 1;
+           }
+           // (left, right) 不在区间内部
+           ans = Math.max(ans, (right-left-1)*nums[i]);
+       }
+       return ans;
+    }
+   #+end_src
+
+** 单调栈
+   第一种暴力枚举方式需要同时处理高度和宽度两个条件, 不便于优化.
+   现在观察第二中暴力枚举, 在固定高度的同时, 只需要处理一个维度即可.
+   同时需要注意到, 无论是向左遍历寻找左边界还是向右遍历寻找右边界都使用相同的方法.
+   现在主要关注左边界的查找: 从下标i-1开始找到第一个小于nums[i]的位置j.
+
+   考虑这样一个事实: 如果 \(j_0 < j_1\) 并且 \(nums[j_0] > nums[j_1]\), 
+   那么从右往左查找小于nums[i]的柱子时, \(j_0\)就会被\(j_1\)"挡住".
+   - 如果 \(nums[i] > nums[j_1]\), 那么\(j_0\) 不会作为答案.
+   - 如果 \(nums[i] <= nums[j_1]\), 那么\(nums[i] < nums[j_0]\), \(j_0\)也不会作为边界
+   因此在查找的过程中可以忽略到\(j_0\)这个位置.
+
+   假设我们有一个递增的高度序列: \(nums[j_0], nums[j_1], \dots, nums[j_s]\), 那么在
+   查找小于nums[i]的柱子时, 只需要从这个序列中查找即可.
+   在查找过程中, 我们可以将比nums[i]大的位置移除序列, 因为在之后的位置查找左边界时nums[i]会把这些
+   位置"挡住", 而且第一个比nums[i]小的元素就是一个边界或者是-1.
