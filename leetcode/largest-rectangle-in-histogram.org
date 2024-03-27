@@ -72,3 +72,27 @@
    查找小于nums[i]的柱子时, 只需要从这个序列中查找即可.
    在查找过程中, 我们可以将比nums[i]大的位置移除序列, 因为在之后的位置查找左边界时nums[i]会把这些
    位置"挡住", 而且第一个比nums[i]小的元素就是一个边界或者是-1.
+
+   #+begin_src java
+   public int largestRectangleArea(int[] nums) {
+       var ans = Integer.MIN_VALUE;
+       var stack = new Stack<Integer>();
+       var n = nums.length;
+       var left = new int[n];
+       var right = new int[n];
+       Arrays.fill(right, n);
+
+       for (int i = 0; i < nums.length; i++) {
+           while (!stack.isEmpty() && nums[stack.peek()] >= nums[i]) {
+               right[stack.peek()] = i;
+               stack.pop();
+           }
+           left[i] = stack.isEmpty() ? -1 : stack.peek();
+           stack.push(i);
+       }
+       for (int i = 0; i < n; i++) {
+           ans = Math.max(ans, (right[i] - left[i] - 1) * nums[i]);
+       }
+       return ans;
+   }
+   #+end_src
